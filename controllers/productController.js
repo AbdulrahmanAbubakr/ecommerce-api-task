@@ -5,20 +5,16 @@ const addProduct = async (req, res) => {
   try {
     const { name, category, price, stock, variants } = req.body;
 
-    // Create the product
     const product = await Product.create({ name, category, price, stock });
 
-    // Create associated variants if they exist
     if (variants && variants.length > 0) {
       const variantRecords = variants.map((variant) => ({
         ...variant,
-        productId: product.id, // Associate with the created product
-      }));
+        productId: product.id,       }));
 
       await Variant.bulkCreate(variantRecords);
     }
 
-    // Fetch the product with its variants
     const newProduct = await Product.findByPk(product.id, { include: Variant });
 
     res.status(201).json(newProduct);
